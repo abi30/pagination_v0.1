@@ -11,7 +11,9 @@ class DB
     {
         try {
             $this->conn = new PDO("mysql:host=" . $this->dbHost . ";dbname=" . $this->dbName, $this->dbUsername, $this->dbPassword);
+            $this->conn->setAttribute(PDO::MYSQL_ATTR_USE_BUFFERED_QUERY, true);
             $this->conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+            // $this->conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
         } catch (PDOException $e) {
             die("Failed to connect with MySQL: " . $e->getMessage());
         }
@@ -135,7 +137,7 @@ class DB
 
 
 
-    public function paging($limit, $numRows, $page)
+    public function paging($limit, $numRows, $page, $url)
     {
 
         $allPages       = ceil($numRows / $limit);
@@ -150,11 +152,11 @@ class DB
         if ($numRows > $limit) {
 
             if ($page <= 1) {
-                echo '<li class="page-item disabled" aria-disabled="true"><a class="page-link" href="?page=' . $previous_page . '" >First</a></li>';
+                echo '<li class="page-item disabled" aria-disabled="true"><a class="page-link" href="' . $url . 'page=' . $previous_page . '" >First</a></li>';
             } else {
-                echo '<li  class="page-item"><a class="page-link" href="?page=1">First</a></li>';
+                echo '<li  class="page-item"><a class="page-link" href="' . $url . 'page=1">First</a></li>';
 
-                echo '<li class="page-item"><a class="page-link" href="?page=' . $previous_page . '" aria-label="Previous">
+                echo '<li class="page-item"><a class="page-link" href="' . $url . 'page=' . $previous_page . '" aria-label="Previous">
             <span aria-hidden="true">&laquo;</span></a>
                   </li>';
             }
@@ -165,7 +167,7 @@ class DB
                     if ($counter == $page) {
                         echo "<li class='page-item active'><a  class='page-link'>$counter</a></li>";
                     } else {
-                        echo "<li class='page-item'><a class='page-link' href='?page=" . $counter . "'>$counter</a></li>";
+                        echo "<li class='page-item'><a class='page-link' href='" . $url . "page=" . $counter . "'>$counter</a></li>";
                     }
                 }
             } elseif ($allPages > 10) {
@@ -175,47 +177,139 @@ class DB
                         if ($counter == $page) {
                             echo "<li class='page-item active'><a class='page-link'>$counter</a></li>";
                         } else {
-                            echo "<li class='page-item'><a class='page-link' href='?page=$counter'>$counter</a></li>";
+                            echo "<li class='page-item'><a class='page-link' href='" . $url . "page=" . $counter . "'>$counter</a></li>";
                         }
                     }
                     echo "<li class='page-item'><a class='page-link'>...</a></li>";
-                    echo "<li class='page-item'><a class='page-link' href='?page=" . $second_last . "'>$second_last</a></li>";
-                    echo "<li class='page-item'><a class='page-link' href='?page=" . $allPages . "'>$allPages</a></li>";
+                    echo "<li class='page-item'><a class='page-link' href='" . $url . "page=" . $second_last . "'>$second_last</a></li>";
+                    echo "<li class='page-item'><a class='page-link' href='" . $url . "page=" . $allPages . "'>$allPages</a></li>";
                 } elseif ($page > 4 && $page < $allPages - 4) {
-                    echo "<li class='page-item'><a class='page-link' href='?page=1'>1</a></li>";
-                    echo "<li class='page-item'><a class='page-link' href='?page=2'>2</a></li>";
+                    echo "<li class='page-item'><a class='page-link' href='" . $url . "page=1'>1</a></li>";
+                    echo "<li class='page-item'><a class='page-link' href='" . $url . "page=2'>2</a></li>";
                     echo "<li class='page-item'><a class='page-link'>...</a></li>";
                     for ($counter = $page - $adjacents; $counter <= $page + $adjacents; $counter++) {
                         if ($counter == $page) {
                             echo "<li class='page-item active'><a class='page-link'>$counter</a></li>";
                         } else {
-                            echo "<li  class='page-item' ><a class='page-link' href='?page=" . $counter . "'>$counter</a></li>";
+                            echo "<li  class='page-item' ><a class='page-link' href='" . $url . "page=" . $counter . "'>$counter</a></li>";
                         }
                     }
                     echo "<li  class='page-item'><a class='page-link'>...</a></li>";
-                    echo "<li  class='page-item'><a class='page-link' href='?page=" . $second_last . "'>$second_last</a></li>";
-                    echo "<li  class='page-item'><a class='page-link' href='?page=" . $allPages . "'>$allPages</a></li>";
+                    echo "<li  class='page-item'><a class='page-link' href='" . $url . "page=" . $second_last . "'>$second_last</a></li>";
+                    echo "<li  class='page-item'><a class='page-link' href='" . $url . "page=" . $allPages . "'>$allPages</a></li>";
                 } else {
-                    echo "<li  class='page-item'><a class='page-link' href='?page=1'>1</a></li>";
-                    echo "<li  class='page-item'><a class='page-link' href='?page=2'>2</a></li>";
+                    echo "<li  class='page-item'><a class='page-link' href='" . $url . "page=1'>1</a></li>";
+                    echo "<li  class='page-item'><a class='page-link' href='" . $url . "page=2'>2</a></li>";
                     echo "<li  class='page-item'><a class='page-link'>...</a></li>";
 
                     for ($counter = $allPages - 6; $counter <= $allPages; $counter++) {
                         if ($counter == $page) {
                             echo "<li class='page-item active'><a class='page-link'>$counter</a></li>";
                         } else {
-                            echo "<li class='page-item'><a class ='page-link' href='?page=" . $counter . "'>$counter</a></li>";
+                            echo "<li class='page-item'><a class ='page-link' href='" . $url . "page=" . $counter . "'>$counter</a></li>";
                         }
                     }
                 }
             }
             if ($page >= $allPages) {
-                echo '<li class="page-item disabled"><a class="page-link" href="?page=' .    $allPages . '">Last</a></li>';
+                echo '<li class="page-item disabled"><a class="page-link" href="" . $url . "page=' .    $allPages . '">Last</a></li>';
             }
             if ($page < $allPages) {
-                echo '<li class="page-item"><a class="page-link" href="?page=' . $next_page . '" aria-label="Next" > <span aria-hidden="true">&raquo;</span></a></li>';
-                echo '<li class="page-item"><a class="page-link" href="?page=' . $allPages . '">Last</a></li>';
+                echo '<li class="page-item"><a class="page-link" href="' . $url . 'page=' . $next_page . '" aria-label="Next" > <span aria-hidden="true">&raquo;</span></a></li>';
+                echo '<li class="page-item"><a class="page-link" href="' . $url . 'page=' . $allPages . '">Last</a></li>';
             }
         }
+    }
+
+
+    public function get_pagination_links_All($current_page, $total_pages, $url)
+    {
+        $links = '<ul class="pagination">';
+        if ($current_page > 1) {
+            $links .= '<li class="page-item">
+         <a class="page-link" href="' . $url . 'page=' . ($current_page - 1) . '" aria-label="Previous">
+       <span aria-hidden="true">&laquo;</span>
+     </a></li>';
+        }
+        if ($total_pages >= 1 && $current_page <= $total_pages) {
+            if ($current_page == 1) {
+
+                $links .= '<li class="page-item active"><a class="page-link" href="' . $url . 'page=1">1</a></li>';
+            } else {
+
+                $links .= '<li class="page-item"><a class="page-link" href="' . $url . 'page=1">1</a></li>';
+            }
+            $i = max(2, $current_page - 5);
+
+            if ($i > 2)
+                $links .= "   ";
+            for (; $i < min($current_page + 6, $total_pages); $i++) {
+
+                if ($i == $current_page) {
+
+                    $links .= '<li class="page-item active"><a class="page-link" href="' . $url . 'page=' . $i . '">' . $i . '</a></li>';
+                } else {
+
+                    $links .= '<li class="page-item"><a class="page-link" href="' . $url . 'page=' . $i . '">' . $i . '</a></li>';
+                }
+            }
+            if ($total_pages > 1) {
+                if ($current_page != $total_pages) {
+
+                    $links .= "   ";
+                    $links .= '<li class="page-item" date="1"><a class="page-link" href="' . $url . 'page=' . $total_pages . '">' . $total_pages . '</a></li>';
+                } else {
+
+                    $links .= "   ";
+                    $links .= '<li class="page-item active" date="2"><a class="page-link" href="' . $url . 'page=' . $total_pages . '">' . $total_pages . '</a></li>';
+                }
+            }
+        }
+        if ($total_pages > $current_page) {
+            $links .= '<li class="page-item">
+      <a class="page-link" href="' . $url . 'page=' . ($current_page + 1) . '" aria-label="Next">
+      <span aria-hidden="true">&raquo;</span></a></li>';
+        }
+        $links .= '</ul>';
+        return $links;
+    }
+
+    public function filtering($group_name, $salary, $offset, $limit)
+    {
+
+
+        $sql = "CALL dynamicFilter(:group_name,:salary);";
+
+        $st = $this->conn->prepare($sql);
+
+        $st = $this->conn->prepare($sql . ' ORDER BY id DESC LIMIT :off, :lim');
+        // $st = $this->conn->prepare('SELECT * FROM users WHERE group_name = :group_name ORDER BY id DESC LIMIT :off, :lim');
+        $st->bindValue(':off', $offset, PDO::PARAM_INT);
+        $st->bindValue(':lim', $limit, PDO::PARAM_INT);
+        $st->bindParam(':group_name', $group_name);
+        $st->bindParam(':salary', $salary);
+        // $st->bindValue(':group_name', $group_name, PDO::PARAM_STR);
+        // $st->bindValue(':salary', $salary, PDO::PARAM_STR);
+        $st->execute();
+        $res =  $st->fetchObject();
+        unset($st);
+
+
+        $query = $res->sqlquery;
+        // echo $query;
+        // exit;
+        $stmt = $this->conn->prepare($query);
+
+        $stmt->execute();
+        $res = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        // echo $query;
+        return $res;
+
+        // exit;
+
+        // return ["result" => $res, "count" => count($res)];
+
+        // dynamicFilter()
+
     }
 }

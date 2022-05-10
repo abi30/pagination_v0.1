@@ -5,26 +5,38 @@ require_once "db.class.php";
 
 
 
+
 if (isset($_GET['page']) && ($_GET['page'] > 0)) {
 
     $page = (int) $_GET['page'];
 } else {
     $page = 1;
+
+    header("Location: " . $_SERVER["PHP_SELF"] . "?page=" . $page);
+    die();
 }
+
 $conn = new DB();
 $limit = 5;
 $offset = ($page - 1) * $limit;
-$searchVal = "";
+// $searchVal = "inactive";
 
 
-if (isset($_POST['filter'])) {
-    $searchVal = $_POST['group'];
+// if (isset($_POST['filter'])) {
+$searchVal = isset($_GET["group"]) ? $_GET["group"] : "";
+$searchSalary = isset($_GET["salary"]) ? $_GET["salary"] : "";
 
-    $pagination = $conn->countRowWithValue($searchVal);
-    $pageBody =  $conn->showPerPageData($limit, $offset, $searchVal);
-}
-
+// $arra = $conn->filtering($searchVal, $searchSalary, $offset, $limit);
+// print_r($arra);
+// exit;
+//     $pagination = $conn->countRowWithValue($searchVal);
+//     $pageBody =  $conn->showPerPageData($limit, $offset, $searchVal);
+// }
+$filter = [];
 $pagination = $conn->countRowWithValue($searchVal);
+if (isset($_GET["group"]) && isset($_GET["salary"])) {
+    $filter = $conn->filtering($searchVal, $searchSalary, $offset, $limit);
+}
 $pageBody =  $conn->showPerPageData($limit, $offset, $searchVal);
 
 
@@ -56,35 +68,86 @@ $pageBody =  $conn->showPerPageData($limit, $offset, $searchVal);
         <h1 class="mt-2 mb-3 text-center text-primary">Pagination</h1>
         <div class="row">
             <div class="col-md-3">&nbsp;</div>
-            <div class="col-md-6">
-                <form method="POST" action="">
+            <div class="col-md-4">
+
+                <form method="GET"
+                    action="finalindex.php?<?= isset($_SERVER['QUERY_STRING']) ? $_SERVER['QUERY_STRING'] : ""; ?>">
+
 
                     <select name="group" class="form-select" id="select_box">
                         <option value="">Select group</option>
                         <?php
+
                         $retvel = $conn->searchForGroup($searchVal);
-                        foreach ($retvel['retval'] as $row) {
-                            echo '<option value="' . $row["group_name"] . '">' . $row["group_name"] . '</option>';
+                        foreach ($retvel['retval'] as $row) { ?>
+                        <option value="<?= $row["group_name"]; ?>"
+                            <?= $row["group_name"]  == (isset($_GET['group']) ? $_GET['group'] : "") ? ' selected="selected"' : ''; ?>>
+                            <?= $row["group_name"] ?> </option>
+                        <?php
                         }
                         ?>
                     </select>
-                    <button class="btn btn-primary" name="filter">Filter</button>
-                    <button class="btn btn-success" name="reset">Reset</button>
+
+                    <!--==============================================-->
+                    <?php
+                    $result = [4533, 6000];
+                    ?>
+                    <select name="salary" class="form-select" id="select_box">
+                        <option value="">Select salary</option>
+                        <?php
+                        foreach ($result as $salary) { ?>
+                        <option value="<?= $salary; ?>"
+                            <?= $salary  == (isset($_GET['salary']) ? $_GET['salary'] : "") ? ' selected="selected"' : ''; ?>>
+                            <?= $salary ?> </option>
+                        <?php
+                        }
+                        ?>
+
+                    </select>
+
+
+
+                    <button class="btn btn-primary" name="page"
+                        value="<?php echo (isset($_GET["group"]) ? 1 : $_GET["page"]); ?>">Filter</button>
+                    <!-- <input type="text" name="page" value=' <?= isset($_GET["group"]) ? 1 : $_GET["page"]; ?>'> -->
+
                 </form>
             </div>
             <div class="col-md-3">&nbsp;</div>
         </div>
         <br />
         <br />
+        <?php
 
+        // echo $_GET["group"];
+        // echo "<br />";
+        // echo $_GET["salary"];
+        // echo "<br />";
+        // echo $_GET["page"];
+        ?>
 
         <nav aria-label="...">
             <ul class="pagination">
 
                 <?php
-                // echo ($list['count']);
-                $conn->paging(5, $pagination['count'], $page);
+                if (isset($_GET['group']) && !isset($_GET['salary'])) {
+                    $url = "finalindex.php?group=" . $_GET['group'] . "&";
+                } else if (isset($_GET['salary']) && !isset($_GET['group'])) {
+                    $url = "finalindex.php?salary=" . $_GET['salary'] . "&";
+                } else if (isset($_GET['salary']) && isset($_GET['salary'])) {
+                    $url = "finalindex.php?group=" . $_GET['group'] . "&salary=" . $_GET['salary'] . "&";
+                } else {
+                    $url = "finalindex.php?";
+                }
+
+
+
+
+                echo $conn->paging(5, $pagination['count'], $page, $url);
+                echo "<br />";
+                echo $url;
                 ?>
+
             </ul>
         </nav>
 
@@ -105,7 +168,7 @@ $pageBody =  $conn->showPerPageData($limit, $offset, $searchVal);
                 <?php
                 if (is_array($pageBody['result'])) {
                     $sn = 1;
-                    foreach ($pageBody['result'] as $data) {
+                    foreach ($filter as $data) {
 
                 ?>
                 <tr>
@@ -293,7 +356,7 @@ $pageBody =  $conn->showPerPageData($limit, $offset, $searchVal);
 
                 <tr>
                     <td colspan="8">
-                        <?php echo $res; ?>
+                        <?php echo "on data avialable !" ?>
                     </td>
                 <tr>
                     <?php
