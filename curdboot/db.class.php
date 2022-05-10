@@ -281,11 +281,8 @@ class DB
         $sql = "CALL dynamicFilter(:group_name,:salary);";
 
         $st = $this->conn->prepare($sql);
-
-        $st = $this->conn->prepare($sql . ' ORDER BY id DESC LIMIT :off, :lim');
         // $st = $this->conn->prepare('SELECT * FROM users WHERE group_name = :group_name ORDER BY id DESC LIMIT :off, :lim');
-        $st->bindValue(':off', $offset, PDO::PARAM_INT);
-        $st->bindValue(':lim', $limit, PDO::PARAM_INT);
+
         $st->bindParam(':group_name', $group_name);
         $st->bindParam(':salary', $salary);
         // $st->bindValue(':group_name', $group_name, PDO::PARAM_STR);
@@ -294,12 +291,15 @@ class DB
         $res =  $st->fetchObject();
         unset($st);
 
+        // $st->bindValue(':off', $offset, PDO::PARAM_INT);
+        // $st->bindValue(':lim', $limit, PDO::PARAM_INT);
 
         $query = $res->sqlquery;
         // echo $query;
         // exit;
         $stmt = $this->conn->prepare($query);
 
+        echo $query . "ORDER BY id DESC LIMIT :off, :lim";
         $stmt->execute();
         $res = $stmt->fetchAll(PDO::FETCH_ASSOC);
         // echo $query;
