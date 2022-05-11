@@ -85,20 +85,23 @@ class DB
         return ["retval" => $retSearch, "status" => false];
     }
 
-    public function countRowWithValue($searchVal)
+    public function countRowWithValue($searchGroup, $searchSalary)
     {
         // 'SELECT DISTINCT group_name FROM users ORDER BY group_name ASC'
         // $smt = $this->conn->prepare('SELECT DISTINCT group_name FROM users ORDER BY group_name  DESC');
         // $smt->execute();
         // $retSearch = $smt->fetchAll(PDO::FETCH_ASSOC);
-        $res = $this->searchForGroup($searchVal);
+        $res = $this->searchForGroup($searchGroup);
         if ($res['status'] == true) {
-            $st = $this->conn->prepare("SELECT * FROM users WHERE group_name = :group_name order by id DESC");
-            $st->bindValue(':group_name', $searchVal, PDO::PARAM_STR);
+            $st = $this->conn->prepare("SELECT * FROM users WHERE group_name = :group_name AND salary <= :salary order by id DESC");
+            $st->bindValue(':salary', $searchSalary, PDO::PARAM_STR);
+            $st->bindValue(':group_name', $searchGroup, PDO::PARAM_STR);
             $st->execute();
             $res =  $st->fetchAll(PDO::FETCH_ASSOC);
+            echo "all sroted data/";
             return ["result" => $res, "count" => count($res)];
         } else {
+            echo "all data/";
             return $this->getAll();
         }
     }
@@ -280,30 +283,57 @@ class DB
 
         $sql = "CALL dynamicFilter(:group_name,:salary);";
 
+        // $st = $this->conn->prepare($sql . 'ORDER BY id DESC LIMIT :off, :lim');
         $st = $this->conn->prepare($sql);
-        // $st = $this->conn->prepare('SELECT * FROM users WHERE group_name = :group_name ORDER BY id DESC LIMIT :off, :lim');
+        // $st = $this->conn->prepare('SELECT * FROM users WHERE group_name = :group_name AND salary <= :salary ORDER BY id DESC LIMIT :off, :lim');
 
-        $st->bindParam(':group_name', $group_name);
-        $st->bindParam(':salary', $salary);
-        // $st->bindValue(':group_name', $group_name, PDO::PARAM_STR);
-        // $st->bindValue(':salary', $salary, PDO::PARAM_STR);
+        $st->bindValue(':group_name', $group_name, PDO::PARAM_STR);
+        $st->bindValue(':salary', $salary, PDO::PARAM_STR);
         $st->execute();
-        $res =  $st->fetchObject();
+        $res = $st->fetchObject();
+
         unset($st);
 
-        // $st->bindValue(':off', $offset, PDO::PARAM_INT);
-        // $st->bindValue(':lim', $limit, PDO::PARAM_INT);
 
         $query = $res->sqlquery;
         // echo $query;
         // exit;
-        $stmt = $this->conn->prepare($query);
+        $sqlall = $query . " ORDER BY id DESC LIMIT :off, :lim";
+        $st = $this->conn->prepare($sqlall);
 
-        echo $query . "ORDER BY id DESC LIMIT :off, :lim";
-        $stmt->execute();
-        $res = $stmt->fetchAll(PDO::FETCH_ASSOC);
-        // echo $query;
-        return $res;
+        $st->bindValue(':off', $offset, PDO::PARAM_INT);
+        $st->bindValue(':lim', $limit, PDO::PARAM_INT);
+        // $st->bindValue(':group_name', $group_name, PDO::PARAM_STR);
+        // $st->bindValue(':salary', $salary, PDO::PARAM_STR);
+
+
+        $st->execute();
+
+        $res =  $st->fetchAll(PDO::FETCH_ASSOC);
+
+
+        // $res =  $st->fetchObject();
+        // echo "mit_search/";
+        // print_r($res);
+        return ["result" => $res, "count" => count($res)];
+        // return $res;
+
+        // exit;
+        // unset($st);
+
+        // $st->bindValue(':off', $offset, PDO::PARAM_INT);
+        // $st->bindValue(':lim', $limit, PDO::PARAM_INT);
+
+        // $query = $res->sqlquery;
+        // // echo $query;
+        // // exit;
+        // $stmt = $this->conn->prepare($query);
+
+        // echo $query . "ORDER BY id DESC LIMIT :off, :lim";
+        // $stmt->execute();
+        // $res = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        // // echo $query;
+        // return $res;
 
         // exit;
 
@@ -311,5 +341,47 @@ class DB
 
         // dynamicFilter()
 
+    }
+    public function maxSalary()
+    {
+        $salarymax = 34432;
+        $smt = $this->conn->prepare('SELECT MAX(salary) as maxisalary FROM users ORDER BY id DESC');
+        $smt->execute();
+        $retmaxVal = $smt->fetch(PDO::FETCH_ASSOC);
+
+        $maxisalary = floatval($retmaxVal['maxisalary']);
+        return $maxisalary;
+    }
+    public function minSalary()
+    {
+        $salarymax = 34432;
+        $smt = $this->conn->prepare('SELECT MIN(salary) as minisalary FROM users ORDER BY id DESC');
+        $smt->execute();
+        $retminVal = $smt->fetch(PDO::FETCH_ASSOC);
+
+        $minisalary = floatval($retminVal['minisalary']);
+        return $minisalary;
+    }
+    public function checkSalary($usermax, $usermin)
+    {
+        $max = $this->maxSalary();
+        $min = $this->minSalary();
+        if ($usermax < $min || $usermax > $max) {
+            echo "here is error not possible";
+        }
+        if ($usermin  < $min) {
+            echo "by daulft error is not possible";
+        }
+        $sql = "SELECT * FROM users WHERE salary >= :salarymin AND salary <= :salarymax ORDER BY id DESC";
+
+        $st = $this->conn->prepare($sql);
+        $st->bindParam(':salarymax', $usermax);
+        $st->bindParam(':salarymin', $usermin);
+
+        $st->execute();
+        $retminVal = $st->fetchAll(PDO::FETCH_ASSOC);
+
+
+        return $retminVal;
     }
 }

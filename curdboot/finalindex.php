@@ -12,8 +12,8 @@ if (isset($_GET['page']) && ($_GET['page'] > 0)) {
 } else {
     $page = 1;
 
-    header("Location: " . $_SERVER["PHP_SELF"] . "?page=" . $page);
-    die();
+    // header("Location: " . $_SERVER["PHP_SELF"] . "?page=" . $page);
+    // die();
 }
 
 $conn = new DB();
@@ -21,25 +21,57 @@ $limit = 5;
 $offset = ($page - 1) * $limit;
 // $searchVal = "inactive";
 
-
-// if (isset($_POST['filter'])) {
+// $searchVal = isset($_GET["group"]) ? $_GET["group"] : "";
+// $searchSalary = isset($_GET["salary"]) ? $_GET["salary"] : "";
+// $searchVal = "";
+// $searchSalary = "";
 $searchVal = isset($_GET["group"]) ? $_GET["group"] : "";
 $searchSalary = isset($_GET["salary"]) ? $_GET["salary"] : "";
+
+$pagination = $conn->countRowWithValue($searchVal, $searchSalary);
+if (($searchVal != "") || ($searchSalary != "")) {
+    $pageBody = $conn->filtering($searchVal, $searchSalary, $offset, $limit);
+    echo $offset . "<br />";
+    echo $limit . "<br />";
+    echo "pass<br />";
+} else {
+
+    $pageBody =  $conn->showPerPageData($limit, $offset, $searchVal);
+    echo $offset . "<br />";
+    echo $limit . "<br />";
+    echo "not  pass<br />";
+}
+
+
+
+if (isset($_GET['salarycheck'])) {
+
+    $maxsalray = $_GET['salarymax'];
+    $minsalray = $_GET['salarymin'];
+    echo $maxsalray . " & " . $minsalray;
+
+    $res = $conn->checkSalary($maxsalray, $minsalray);
+
+    print_r($res);
+}
+
+echo $resultmax =  $conn->maxSalary();
+echo "<br />";
+echo  $resultmin =  $conn->minSalary();
+
 
 // $arra = $conn->filtering($searchVal, $searchSalary, $offset, $limit);
 // print_r($arra);
 // exit;
-//     $pagination = $conn->countRowWithValue($searchVal);
-//     $pageBody =  $conn->showPerPageData($limit, $offset, $searchVal);
+
 // }
-$filter = [];
-$pagination = $conn->countRowWithValue($searchVal);
-if (isset($_GET["group"]) && isset($_GET["salary"])) {
-    $filter = $conn->filtering($searchVal, $searchSalary, $offset, $limit);
-}
-$pageBody =  $conn->showPerPageData($limit, $offset, $searchVal);
 
 
+// $pageBody = $conn->filtering($searchVal, $searchSalary, $offset, $limit);
+// $pagination = $conn->filtering($searchVal, $searchSalary, $offset, $limit);
+
+
+// $pageBody =  $conn->showPerPageData($limit, $offset, $searchVal);
 
 
 // print_r($list["result"]);
@@ -58,9 +90,18 @@ $pageBody =  $conn->showPerPageData($limit, $offset, $searchVal);
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
         integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <script src="https://code.jquery.com/jquery-3.6.0.js"
+        integrity="sha256-H+K7U5CnXl1h5ywQfKtSj8PCmoN9aaq30gDh27Xc0jk=" crossorigin="anonymous"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
 
     <title>Hello, world!</title>
 </head>
+<style>
+.error {
+    color: red;
+    font-family: verdana, Helvetica;
+}
+</style>
 
 <body>
 
@@ -90,7 +131,7 @@ $pageBody =  $conn->showPerPageData($limit, $offset, $searchVal);
 
                     <!--==============================================-->
                     <?php
-                    $result = [4533, 6000];
+                    $result = [453, 6000, 60000, 77777];
                     ?>
                     <select name="salary" class="form-select" id="select_box">
                         <option value="">Select salary</option>
@@ -112,6 +153,80 @@ $pageBody =  $conn->showPerPageData($limit, $offset, $searchVal);
                     <!-- <input type="text" name="page" value=' <?= isset($_GET["group"]) ? 1 : $_GET["page"]; ?>'> -->
 
                 </form>
+
+
+                <a value="">
+                    <button type="button" class="btn btn-warning btn-md" data-bs-toggle="modal"
+                        data-bs-target="#salary">
+                        checkSalaryRange
+                    </button></a>
+
+                <!-- ====================== -->
+                <div class=" modal fade" id="salary" tabindex="-1" aria-labelledby="exampleModalLabel"
+                    aria-hidden="true">
+
+                    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable ">
+                        <div class="modal-content">
+
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="exampleModalLabel">Salary Check</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                    aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+
+                                <!-- ======================================================= -->
+                                <form id="mysalaryForm" class="needs-validation" action="" method="GET">
+                                    <div class="container">
+                                        <div class="form-group row pt-2">
+                                            <label for="salarymax" class="col-sm-2 col-form-label">MAX Salary</label>
+                                            <div class="col-sm-10">
+                                                <input type="text" class="form-control" id="salarymax_id"
+                                                    name="salarymax" placeholder="Enter your Salary" value="" />
+                                                <span id="maxerror"></span>
+                                                <div class="invalid-feedback">
+                                                    Please choose a number.
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="form-group row pt-2">
+                                            <label for="salarymin" class="col-sm-2 col-form-label">MIN Salary</label>
+                                            <div class="col-sm-10">
+                                                <input type="text" class="form-control" id="salarymin_id"
+                                                    name="salarymin" placeholder="Enter your Salary"
+                                                    value="<?php echo $data['salary'] ?? ''; ?>" r />
+                                                <div class="invalid-feedback">
+                                                    Please choose a number.
+                                                </div>
+                                            </div>
+                                        </div>
+
+
+                                        <input id="maxsalary" type="text" name="" value="<?= $conn->maxSalary() ?>" />
+                                        <input id="minsalary" type="text" name="" value="<?= $conn->minSalary() ?>" />
+
+                                        <div class="text-center pt-4">
+                                            <button class="btn btn-success" type="submit" id="salarycheck"
+                                                name="salarycheck" value="submit">Checking Salary</button>
+                                        </div>
+
+
+                                    </div>
+                                </form>
+
+
+
+                            </div>
+
+                            <div class="modal-footer border-0">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+                <!-- ====================== -->
             </div>
             <div class="col-md-3">&nbsp;</div>
         </div>
@@ -168,7 +283,7 @@ $pageBody =  $conn->showPerPageData($limit, $offset, $searchVal);
                 <?php
                 if (is_array($pageBody['result'])) {
                     $sn = 1;
-                    foreach ($filter as $data) {
+                    foreach ($pageBody['result'] as $data) {
 
                 ?>
                 <tr>
@@ -368,11 +483,80 @@ $pageBody =  $conn->showPerPageData($limit, $offset, $searchVal);
         integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous">
     </script>
 
+    <script src="http://ajax.aspnetcdn.com/ajax/jquery.validate/1.11.1/jquery.validate.min.js"></script>
     <!-- Option 2: Separate Popper and Bootstrap JS -->
     <!--
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js" integrity="sha384-IQsoLXl5PILFhosVNubq5LC7Qb9DXgDA9i+tQ8Zj3iwWAwPtgFTxbJ8NT4GN1R8p" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.min.js" integrity="sha384-cVKIPhGWiC2Al4u+LWgxfKTRIcfu0JTxR+EQDz/bgldoEyl4H0zUF0QKbrJ0EcQF" crossorigin="anonymous"></script>
     -->
+    <script>
+    $(document).ready(function() {
+
+
+        $('#salarymax_id').on("keyup", function() {
+
+            var varmax = parseFloat($('#maxsalary').val());
+            var maxSalary = parseFloat($("#salarymax_id").val());
+            if (varmax > maxSalary) {
+                $("#maxerror").text("error");
+                console.log(maxSalary);
+
+            } else {
+                $("#maxerror").text("success");
+            }
+        });
+    });
+
+
+
+    // $(function() {
+    //     var varmax = $('#maxsalary').val();
+    //     var varmin = $('#minsalary').val();
+
+
+    //     // var maxSalary = $("#salarymax_id").val();
+    //     var maxSalary = $("#salarymax_id").val();
+    //     var minSalary = $("#salarymin_id").val();
+
+
+
+
+
+    //     // $("#mysalaryForm").validate({
+
+    //     //     rules: {
+    //     //         salarymax: {
+    //     //             required: true,
+    //     //             // range: [10, 100]
+    //     //             range: [varmin, varmax]
+    //     //         },
+    //     //         salarymin: {
+    //     //             required: true,
+    //     //             // min: varmin,
+    //     //             range: [varmin, maxSalary]
+
+    //     //         },
+
+    //     //         factor: {
+    //     //             required: true,
+    //     //             range: [0.08, 0.09]
+    //     //         },
+    //     //         dullness: {
+    //     //             required: true,
+    //     //             range: [-9.5, 11.1]
+    //     //         }
+    //     //     }
+    //     // });
+
+
+
+
+
+
+
+    // });
+    </script>
 </body>
+
 
 </html>

@@ -1,136 +1,68 @@
 <?php
 
-error_reporting(-1);
-ini_set('display_errors', 'On');
+require_once "db.class.php";
 
-// require_once "db.class.php";
-require_once "dbconnect.php";
-// $conn = new DB();
+
+
+
 
 if (isset($_GET['page']) && ($_GET['page'] > 0)) {
 
     $page = (int) $_GET['page'];
 } else {
     $page = 1;
+
+    header("Location: " . $_SERVER["PHP_SELF"] . "?page=" . $page);
+    die();
 }
 
+$conn = new DB();
 $limit = 5;
 $offset = ($page - 1) * $limit;
+// $searchVal = "inactive";
 
+// $searchVal = isset($_GET["group"]) ? $_GET["group"] : "";
+// $searchSalary = isset($_GET["salary"]) ? $_GET["salary"] : "";
+// $searchVal = "";
+// $searchSalary = "";
+$searchVal = isset($_GET["group"]) ? $_GET["group"] : "";
+$searchSalary = isset($_GET["salary"]) ? $_GET["salary"] : "";
 
-// $sql = "SELECT * FROM users order by id DESC LIMIT :offset, :limit";
-// $statement = $conn->prepare($sql);
-// $statement->execute([
-//     'offset' => $offset,
-//     'limit'  => $limit,
-// ]);
-// $res = $statement->fetchAll(PDO::FETCH_ASSOC);
+$pagination = $conn->countRowWithValue($searchVal, $searchSalary);
+if (($searchVal != "") || ($searchSalary != "")) {
+    $pageBody = $conn->filtering($searchVal, $searchSalary, $offset, $limit);
+    echo $offset;
+    echo $limit;
+    echo "pass";
+} else {
 
-
-// echo "<pre>";
-// print_r($res);
-// echo "</pre>";
-
-
-// for count of number of rows
-$sqlall = "SELECT * FROM users ORDER BY id DESC";
-$statement = $pdo->prepare($sqlall);
-$statement->execute();
-$resall = $statement->fetchAll(PDO::FETCH_ASSOC);
-$numRows = count($resall);
-// echo $numRows;
-// exit;
-function paging($limit, $numRows, $page)
-{
-
-    $allPages       = ceil($numRows / $limit);
-    $start          = ($page - 1) * $limit;
-    $second_last = $allPages - 1;
-    $adjacents = "2";
-    $previous_page = $page - 1;
-    $next_page = $page + 1;
-
-    $querystring = "";
-
-    if ($numRows > $limit) {
-
-        if ($page <= 1) {
-            echo '<li class="page-item disabled" aria-disabled="true"><a class="page-link" href="?page=' . $previous_page . '" >First</a></li>';
-        } else {
-            echo '<li  class="page-item"><a class="page-link" href="?page=1">First</a></li>';
-
-            echo '<li class="page-item"><a class="page-link" href="?page=' . $previous_page . '" aria-label="Previous">
-            <span aria-hidden="true">&laquo;</span></a>
-                  </li>';
-        }
-
-        if ($allPages <= 10) {
-
-            for ($counter = 1; $counter <= $allPages; $counter++) {
-                if ($counter == $page) {
-                    echo "<li class='page-item active'><a  class='page-link'>$counter</a></li>";
-                } else {
-                    echo "<li class='page-item'><a class='page-link' href='?page=" . $counter . "'>$counter</a></li>";
-                }
-            }
-        } elseif ($allPages > 10) {
-
-            if ($page <= 4) {
-                for ($counter = 1; $counter < 8; $counter++) {
-                    if ($counter == $page) {
-                        echo "<li class='page-item active'><a class='page-link'>$counter</a></li>";
-                    } else {
-                        echo "<li class='page-item'><a class='page-link' href='?page=$counter'>$counter</a></li>";
-                    }
-                }
-                echo "<li class='page-item'><a class='page-link'>...</a></li>";
-                echo "<li class='page-item'><a class='page-link' href='?page=" . $second_last . "'>$second_last</a></li>";
-                echo "<li class='page-item'><a class='page-link' href='?page=" . $allPages . "'>$allPages</a></li>";
-            } elseif ($page > 4 && $page < $allPages - 4) {
-                echo "<li class='page-item'><a class='page-link' href='?page=1'>1</a></li>";
-                echo "<li class='page-item'><a class='page-link' href='?page=2'>2</a></li>";
-                echo "<li class='page-item'><a class='page-link'>...</a></li>";
-                for ($counter = $page - $adjacents; $counter <= $page + $adjacents; $counter++) {
-                    if ($counter == $page) {
-                        echo "<li class='page-item active'><a class='page-link'>$counter</a></li>";
-                    } else {
-                        echo "<li  class='page-item' ><a class='page-link' href='?page=" . $counter . "'>$counter</a></li>";
-                    }
-                }
-                echo "<li  class='page-item'><a class='page-link'>...</a></li>";
-                echo "<li  class='page-item'><a class='page-link' href='?page=" . $second_last . "'>$second_last</a></li>";
-                echo "<li  class='page-item'><a class='page-link' href='?page=" . $allPages . "'>$allPages</a></li>";
-            } else {
-                echo "<li  class='page-item'><a class='page-link' href='?page=1'>1</a></li>";
-                echo "<li  class='page-item'><a class='page-link' href='?page=2'>2</a></li>";
-                echo "<li  class='page-item'><a class='page-link'>...</a></li>";
-
-                for ($counter = $allPages - 6; $counter <= $allPages; $counter++) {
-                    if ($counter == $page) {
-                        echo "<li class='page-item active'><a class='page-link'>$counter</a></li>";
-                    } else {
-                        echo "<li class='page-item'><a class ='page-link' href='?page=" . $counter . "'>$counter</a></li>";
-                    }
-                }
-            }
-        }
-        if ($page >= $allPages) {
-            echo '<li class="page-item disabled"><a class="page-link" href="?page=' .    $allPages . '">Last</a></li>';
-        }
-        if ($page < $allPages) {
-            echo '<li class="page-item"><a class="page-link" href="?page=' . $next_page . '" aria-label="Next" > <span aria-hidden="true">&raquo;</span></a></li>';
-            echo '<li class="page-item"><a class="page-link" href="?page=' . $allPages . '">Last</a></li>';
-        }
-    }
+    $pageBody =  $conn->showPerPageData($limit, $offset, $searchVal);
+    echo $offset;
+    echo $limit;
+    echo "not  pass";
 }
 
 
 
-// -----------------------
+// $arra = $conn->filtering($searchVal, $searchSalary, $offset, $limit);
+// print_r($arra);
+// exit;
+
+// }
 
 
+// $pageBody = $conn->filtering($searchVal, $searchSalary, $offset, $limit);
+// $pagination = $conn->filtering($searchVal, $searchSalary, $offset, $limit);
+
+
+// $pageBody =  $conn->showPerPageData($limit, $offset, $searchVal);
+
+
+// print_r($list["result"]);
 
 ?>
+
+
 <!doctype html>
 <html lang="en">
 
@@ -147,111 +79,113 @@ function paging($limit, $numRows, $page)
 </head>
 
 <body>
+
     <div class="container">
+        <h1 class="mt-2 mb-3 text-center text-primary">Pagination</h1>
+        <div class="row">
+            <div class="col-md-3">&nbsp;</div>
+            <div class="col-md-4">
+
+                <form method="GET"
+                    action="finalindex.php?<?= isset($_SERVER['QUERY_STRING']) ? $_SERVER['QUERY_STRING'] : ""; ?>">
 
 
-        <hr>
-        <form method="GET" action="testpage2.php?<?php echo $_GET['tb1']; ?>&page=1" class="form-inline">
+                    <select name="group" class="form-select" id="select_box">
+                        <option value="">Select group</option>
+                        <?php
+
+                        $retvel = $conn->searchForGroup($searchVal);
+                        foreach ($retvel['retval'] as $row) { ?>
+                        <option value="<?= $row["group_name"]; ?>"
+                            <?= $row["group_name"]  == (isset($_GET['group']) ? $_GET['group'] : "") ? ' selected="selected"' : ''; ?>>
+                            <?= $row["group_name"] ?> </option>
+                        <?php
+                        }
+                        ?>
+                    </select>
+
+                    <!--==============================================-->
+                    <?php
+                    $result = [453, 6000, 60000, 77777];
+                    ?>
+                    <select name="salary" class="form-select" id="select_box">
+                        <option value="">Select salary</option>
+                        <?php
+                        foreach ($result as $salary) { ?>
+                        <option value="<?= $salary; ?>"
+                            <?= $salary  == (isset($_GET['salary']) ? $_GET['salary'] : "") ? ' selected="selected"' : ''; ?>>
+                            <?= $salary ?> </option>
+                        <?php
+                        }
+                        ?>
+
+                    </select>
 
 
 
-            <!-- testpage2.php?tb1=<?php echo $_GET['tb1']; ?>?page=<?php echo $_GET['page'] ?> -->
-            <select name="tb1" class="form-control">
+                    <button class="btn btn-primary" name="page"
+                        value="<?php echo (isset($_GET["group"]) ? 1 : $_GET["page"]); ?>">Filter</button>
+                    <!-- <input type="text" name="page" value=' <?= isset($_GET["group"]) ? 1 : $_GET["page"]; ?>'> -->
 
-                <option>Select_Group</option>
-                <?php
-                $sqlsearch = 'SELECT DISTINCT group_name FROM users ORDER BY group_name ASC';
-                $statement->bindParam(':group_name', $_GET['tb1']);
-                $statement = $pdo->prepare($sqlsearch);
-                $statement->execute();
+                </form>
+            </div>
+            <div class="col-md-3">&nbsp;</div>
+        </div>
+        <br />
+        <br />
+        <?php
 
-                while ($crow = $statement->fetch(PDO::FETCH_ASSOC)) {
-                    echo "<option";
-                    if (isset($_GET['tb1']) and $_GET['tb1'] == $crow['group_name']) echo 'selected="selected"';
-                    echo ">{$crow['group_name']}</option>\n";
-                }
-                ?>
-            </select>
-            <button class="btn alert-danger" value="<? echo isset($_GET['page']) ? $_GET['page'] : 1; ?>"
-                type="submit">submit</button>
-
-        </form>
-        <hr>
-
+        // echo $_GET["group"];
+        // echo "<br />";
+        // echo $_GET["salary"];
+        // echo "<br />";
+        // echo $_GET["page"];
+        ?>
 
         <nav aria-label="...">
             <ul class="pagination">
 
                 <?php
-
-
-                if (isset($_GET['tb1'])) {
-
-                    $condition = "";
-                    if (isset($_GET['tb1']) and $_GET['tb1'] != "") {
-                        $condition .= " AND group_name='" . $_GET['tb1'] . "'";
-                    }
-                    $limit = 5;
-                    $offset = ($page - 1) * $limit;
-
-                    // $qryStr        = 'SELECT * FROM users WHERE 1 ' . $condition . ' ORDER BY group_name ASC';
-                    // $qryStr        = 'SELECT * FROM users WHERE 1 = 1 and group_name = :group_name ORDER BY group_name ASC';
-                    $qryStr        = 'SELECT * FROM users WHERE 1  ' . $condition . ' ORDER BY :group_name DESC LIMIT :offset, :limit';
-                    // $qryStr        = 'SELECT * FROM users WHERE 1  ' . $condition . ' ORDER BY :group_name DESC LIMIT :limit OFFSET :offset';
-
-                    $statement = $pdo->prepare($qryStr);
-                    $statement->bindParam(':group_name', $_GET['tb1']);
-                    $statement->bindParam(':limit', $limit);
-                    $statement->bindParam(':offset', $offset);
-                    $statement->execute();
-                    $resallsearch = $statement->fetchAll(PDO::FETCH_ASSOC);
-
-
-                    $numRows      = count($resallsearch);
-                    echo $numRows;
-                    // exit;
-                    // $limit = 5;
-
-                    // $offset = ($page - 1) * $limit;
-                    // $sql = "SELECT * FROM users order by id DESC LIMIT :offset, :limit";
-                    // $statement = $pdo->prepare($sql);
-                    // $statement->execute([
-                    //     'offset' => $offset,
-                    //     'limit'  => $limit,
-                    // ]);
-                    // $res = $statement->fetchAll(PDO::FETCH_ASSOC);
-                    echo $page;
-
-                    echo paging($limit, $numRows, $page);
+                if (isset($_GET['group']) && !isset($_GET['salary'])) {
+                    $url = "finalindex.php?group=" . $_GET['group'] . "&";
+                } else if (isset($_GET['salary']) && !isset($_GET['group'])) {
+                    $url = "finalindex.php?salary=" . $_GET['salary'] . "&";
+                } else if (isset($_GET['salary']) && isset($_GET['salary'])) {
+                    $url = "finalindex.php?group=" . $_GET['group'] . "&salary=" . $_GET['salary'] . "&";
                 } else {
-                    echo paging($limit, $numRows, $page);
+                    $url = "finalindex.php?";
                 }
+
+
+
+
+                echo $conn->paging(5, $pagination['count'], $page, $url);
+                echo "<br />";
+                echo $url;
                 ?>
+
             </ul>
         </nav>
+
         <table class="table table-bordered" style="margin-left:auto;margin-right:auto;">
             <thead>
                 <tr>
-                    <th>S.N</th>
-                    <th>id</th>
-                    <th>Name</th>
-                    <th>salary</th>
-                    <th>Email</th>
-                    <th>date_update</th>
-                    <th>group</th>
-                    <th>action</th>
-
+                    <th scope="col">#sn</th>
+                    <th scope="col">Id</th>
+                    <th scope="col">name</th>
+                    <th scope="col">salary</th>
+                    <th scope="col">email</th>
+                    <th scope="col">group</th>
+                    <th scope="col">update_at</th>
+                    <th scope="col">Action</th>
+                </tr>
             </thead>
             <tbody>
                 <?php
-                if (isset($_GET['tb1'])) {
-                    $array = $resallsearch;
-                } else {
-                    $array = $res;
-                }
-                if (is_array($array)) {
+                if (is_array($pageBody['result'])) {
                     $sn = 1;
-                    foreach ($array as $data) {
+                    foreach ($pageBody['result'] as $data) {
+
                 ?>
                 <tr>
                     <td><?php echo $sn; ?></td>
@@ -259,8 +193,8 @@ function paging($limit, $numRows, $page)
                     <td><?php echo $data['name'] ?? ''; ?></td>
                     <td><?php echo $data['salary'] ?? ''; ?></td>
                     <td><?php echo $data['email'] ?? ''; ?></td>
-                    <td><?php echo $data['update_at'] ?? ''; ?></td>
                     <td><?php echo $data['group_name'] ?? ''; ?></td>
+                    <td><?php echo $data['update_at'] ?? ''; ?></td>
 
                     <!-- action edit and delate -->
                     <td><a value="<?php echo $data["id"]; ?>">
@@ -435,36 +369,26 @@ function paging($limit, $numRows, $page)
                         $sn++;
                     }
                 } else { ?>
+
                 <tr>
                     <td colspan="8">
-                        <?php echo $res; ?>
+                        <?php echo "on data avialable !" ?>
                     </td>
                 <tr>
                     <?php
                 } ?>
             </tbody>
         </table>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous">
+    </script>
 
-        <!-- <li class="page-item">
-                    <a class="page-link" href="#">Next</a>
-                </li> -->
-
-
-
-        <!-- Optional JavaScript; choose one of the two! -->
-
-        <!-- Option 1: Bootstrap Bundle with Popper -->
-        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
-            integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous">
-        </script>
-
-        <!-- Option 2: Separate Popper and Bootstrap JS -->
-        <!--
+    <!-- Option 2: Separate Popper and Bootstrap JS -->
+    <!--
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js" integrity="sha384-IQsoLXl5PILFhosVNubq5LC7Qb9DXgDA9i+tQ8Zj3iwWAwPtgFTxbJ8NT4GN1R8p" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.min.js" integrity="sha384-cVKIPhGWiC2Al4u+LWgxfKTRIcfu0JTxR+EQDz/bgldoEyl4H0zUF0QKbrJ0EcQF" crossorigin="anonymous"></script>
     -->
-    </div>
-
 </body>
 
 </html>
