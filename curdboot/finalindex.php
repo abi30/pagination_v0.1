@@ -181,8 +181,8 @@ echo  $resultmin =  $conn->minSalary();
                                         <div class="form-group row pt-2">
                                             <label for="salarymax" class="col-sm-2 col-form-label">MAX Salary</label>
                                             <div class="col-sm-10">
-                                                <input type="text" class="form-control" id="salarymax_id"
-                                                    name="salarymax" placeholder="Enter your Salary" value="" />
+                                                <input type="text" class="form-control" id="salarymax" name="salarymax"
+                                                    placeholder="Enter your Salary" value="" />
                                                 <span id="maxerror"></span>
                                                 <div class="invalid-feedback">
                                                     Please choose a number.
@@ -192,8 +192,8 @@ echo  $resultmin =  $conn->minSalary();
                                         <div class="form-group row pt-2">
                                             <label for="salarymin" class="col-sm-2 col-form-label">MIN Salary</label>
                                             <div class="col-sm-10">
-                                                <input type="text" class="form-control" id="salarymin_id"
-                                                    name="salarymin" placeholder="Enter your Salary"
+                                                <input type="text" class="form-control" id="salarymin" name="salarymin"
+                                                    placeholder="Enter your Salary"
                                                     value="<?php echo $data['salary'] ?? ''; ?>" r />
                                                 <div class="invalid-feedback">
                                                     Please choose a number.
@@ -484,77 +484,86 @@ echo  $resultmin =  $conn->minSalary();
     </script>
 
     <script src="http://ajax.aspnetcdn.com/ajax/jquery.validate/1.11.1/jquery.validate.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.0/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.0/jquery.validate.min.js"></script>
+
     <!-- Option 2: Separate Popper and Bootstrap JS -->
     <!--
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js" integrity="sha384-IQsoLXl5PILFhosVNubq5LC7Qb9DXgDA9i+tQ8Zj3iwWAwPtgFTxbJ8NT4GN1R8p" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.min.js" integrity="sha384-cVKIPhGWiC2Al4u+LWgxfKTRIcfu0JTxR+EQDz/bgldoEyl4H0zUF0QKbrJ0EcQF" crossorigin="anonymous"></script>
     -->
     <script>
+    // $(document).ready(function() {
+
+
+    //     $('#salarymax_id').on("keyup", function() {
+
+    //         var varmax = parseFloat($('#maxsalary').val());
+    //         var maxSalary = parseFloat($("#salarymax_id").val());
+    //         if (varmax > maxSalary) {
+    //             $("#maxerror").text("error");
+    //             console.log(maxSalary);
+
+    //         } else {
+    //             $("#maxerror").text("success");
+    //         }
+    //     });
+    // });
+
     $(document).ready(function() {
 
-
         $('#salarymax_id').on("keyup", function() {
+            var maxSalary = $("#salarymax_id").val();
+            console.log(maxSalary);
+        });
+        //input text fields
+        var varmax = parseFloat($('#maxsalary').val());
+        var varmin = parseFloat($('#minsalary').val());
+        console.log(varmax, varmin);
 
-            var varmax = parseFloat($('#maxsalary').val());
-            var maxSalary = parseFloat($("#salarymax_id").val());
-            if (varmax > maxSalary) {
-                $("#maxerror").text("error");
-                console.log(maxSalary);
 
-            } else {
-                $("#maxerror").text("success");
+        var minSalary = parseFloat($("#salarymin_id").val());
+        $("#mysalaryForm").validate({
+            rules: {
+
+                age: {
+                    required: true,
+                    number: true,
+                    min: 18
+                },
+                email: {
+                    required: true,
+                    email: true
+                },
+                weight: {
+                    required: {
+                        depends: function(elem) {
+                            return $("#age").val() > 50
+                        }
+                    },
+                    number: true,
+                    min: 0
+                }
+            },
+            messages: {
+                name: {
+                    minlength: "Name should be at least 3 characters"
+                },
+                age: {
+                    required: "Please enter your age",
+                    number: "Please enter your age as a numerical value",
+                    min: "You must be at least 18 years old"
+                },
+                email: {
+                    email: "The email should be in the format: abc@domain.tld"
+                },
+                weight: {
+                    required: "People with age over 50 have to enter their weight",
+                    number: "Please enter your weight as a numerical value"
+                }
             }
         });
     });
-
-
-
-    // $(function() {
-    //     var varmax = $('#maxsalary').val();
-    //     var varmin = $('#minsalary').val();
-
-
-    //     // var maxSalary = $("#salarymax_id").val();
-    //     var maxSalary = $("#salarymax_id").val();
-    //     var minSalary = $("#salarymin_id").val();
-
-
-
-
-
-    //     // $("#mysalaryForm").validate({
-
-    //     //     rules: {
-    //     //         salarymax: {
-    //     //             required: true,
-    //     //             // range: [10, 100]
-    //     //             range: [varmin, varmax]
-    //     //         },
-    //     //         salarymin: {
-    //     //             required: true,
-    //     //             // min: varmin,
-    //     //             range: [varmin, maxSalary]
-
-    //     //         },
-
-    //     //         factor: {
-    //     //             required: true,
-    //     //             range: [0.08, 0.09]
-    //     //         },
-    //     //         dullness: {
-    //     //             required: true,
-    //     //             range: [-9.5, 11.1]
-    //     //         }
-    //     //     }
-    //     // });
-
-
-
-
-
-
-
-    // });
     </script>
 </body>
 
