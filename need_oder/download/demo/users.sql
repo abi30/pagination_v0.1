@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: May 06, 2022 at 02:48 PM
+-- Generation Time: May 11, 2022 at 04:32 PM
 -- Server version: 10.4.22-MariaDB
 -- PHP Version: 7.4.26
 
@@ -56,7 +56,7 @@ INSERT INTO `users` (`id`, `name`, `salary`, `email`, `update_at`, `group_name`)
 (67, 'xxxyyy', '111222.00', 'xxxyyy@com.com', '2022-05-04 08:44:18', 'Active'),
 (73, 'abdulla ', '3434.00', 'rakib0751@gmail.com', '2022-05-04 10:01:58', 'Active'),
 (80, 'fgfrrsd', '343.66', 'rertertre@erttre.at', '2022-05-04 10:19:35', 'Active'),
-(81, '334343dfsdfsdfsda', '0.00', 'sdfdsd@aasd.dsa', '2022-05-04 10:21:49', 'Active'),
+(81, '334343dfsdfsdfsda', '55.45', 'sdfdsd@aasd.dsa', '2022-05-11 10:10:20', 'Active'),
 (82, 'abdulla ', '3434.43', 'kdjioeds@grimfa.d', '2022-05-04 11:10:23', 'Active'),
 (83, 'sdfsd', '222.54', 'dsfoisdsdf@ggoa.com', '2022-05-04 11:10:57', 'Active'),
 (84, 'abdulla ', '3434.54', 'rakib0751@gmail.com', '2022-05-04 11:12:17', 'Active'),
@@ -80,7 +80,6 @@ INSERT INTO `users` (`id`, `name`, `salary`, `email`, `update_at`, `group_name`)
 (123, 'abdulla ', '88888.00', '', '2022-05-03 07:42:16', 'Active'),
 (124, 'abdulla ', '77777.00', '', '2022-05-03 07:42:16', 'Active'),
 (125, 'abdulla ', '543.00', 'dsfoisdsdf@ggoa.com', '2022-05-03 15:26:37', 'Active'),
-(126, 'gjhh', '321.00', 'zt', '2022-05-04 08:00:37', 'Active'),
 (127, 'gjhh', '320.00', 'rakib0751@gmail.com', '2022-05-04 11:16:43', 'Active'),
 (128, 'fgfrrsd', '45543.00', 'dsfoisdsdf@ggoa.com', '2022-05-03 15:26:27', 'Active'),
 (129, 'abdulla ', '55645.00', '', '2022-05-03 15:28:46', 'Active'),
@@ -90,7 +89,7 @@ INSERT INTO `users` (`id`, `name`, `salary`, `email`, `update_at`, `group_name`)
 (133, 'xxxyyy', '111222.00', 'xxxyyy@com.com', '2022-05-04 08:44:18', 'Active'),
 (134, 'abdulla ', '3434.00', 'rakib0751@gmail.com', '2022-05-04 10:01:58', 'Active'),
 (135, 'fgfrrsd', '343.66', 'rertertre@erttre.at', '2022-05-04 10:19:35', 'Active'),
-(136, '334343dfsdfsdfsda', '0.00', 'sdfdsd@aasd.dsa', '2022-05-04 10:21:49', 'Active'),
+(136, '334343dfsdfsdfsda', '565.00', 'sdfdsd@aasd.dsa', '2022-05-11 10:10:44', 'Active'),
 (137, 'abdulla ', '3434.43', 'kdjioeds@grimfa.d', '2022-05-04 11:10:23', 'Active'),
 (138, 'sdfsd', '222.54', 'dsfoisdsdf@ggoa.com', '2022-05-04 11:10:57', 'Active'),
 (139, 'abdulla ', '3434.54', 'rakib0751@gmail.com', '2022-05-04 11:12:17', 'Active'),
