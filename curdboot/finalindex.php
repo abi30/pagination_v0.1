@@ -193,8 +193,8 @@ echo  $resultmin =  $conn->minSalary();
                                             <label for="salarymin" class="col-sm-2 col-form-label">MIN Salary</label>
                                             <div class="col-sm-10">
                                                 <input type="text" class="form-control" id="salarymin" name="salarymin"
-                                                    placeholder="Enter your Salary"
-                                                    value="<?php echo $data['salary'] ?? ''; ?>" r />
+                                                    placeholder="Enter your Salary" value="" />
+                                                <span id="minerror"></span>
                                                 <div class="invalid-feedback">
                                                     Please choose a number.
                                                 </div>
@@ -202,8 +202,10 @@ echo  $resultmin =  $conn->minSalary();
                                         </div>
 
 
-                                        <input id="maxsalary" type="text" name="" value="<?= $conn->maxSalary() ?>" />
-                                        <input id="minsalary" type="text" name="" value="<?= $conn->minSalary() ?>" />
+                                        <input id="maxsalaryinput" type="hidden" name=""
+                                            value="<?= $conn->maxSalary() ?>" />
+                                        <input id="minsalaryinput" type="hidden" name=""
+                                            value="<?= $conn->minSalary() ?>" />
 
                                         <div class="text-center pt-4">
                                             <button class="btn btn-success" type="submit" id="salarycheck"
@@ -493,77 +495,115 @@ echo  $resultmin =  $conn->minSalary();
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.min.js" integrity="sha384-cVKIPhGWiC2Al4u+LWgxfKTRIcfu0JTxR+EQDz/bgldoEyl4H0zUF0QKbrJ0EcQF" crossorigin="anonymous"></script>
     -->
     <script>
-    // $(document).ready(function() {
-
-
-    //     $('#salarymax_id').on("keyup", function() {
-
-    //         var varmax = parseFloat($('#maxsalary').val());
-    //         var maxSalary = parseFloat($("#salarymax_id").val());
-    //         if (varmax > maxSalary) {
-    //             $("#maxerror").text("error");
-    //             console.log(maxSalary);
-
-    //         } else {
-    //             $("#maxerror").text("success");
-    //         }
-    //     });
-    // });
-
     $(document).ready(function() {
 
-        $('#salarymax_id').on("keyup", function() {
-            var maxSalary = $("#salarymax_id").val();
-            console.log(maxSalary);
-        });
-        //input text fields
-        var varmax = parseFloat($('#maxsalary').val());
-        var varmin = parseFloat($('#minsalary').val());
+        //     //input text fields
+        var varmax = parseFloat($('#maxsalaryinput').val());
+        var varmin = parseFloat($('#minsalaryinput').val());
         console.log(varmax, varmin);
+        // console.log(maxSalary);
+        // console.log(minSalary);
 
 
-        var minSalary = parseFloat($("#salarymin_id").val());
-        $("#mysalaryForm").validate({
-            rules: {
+        $("#maxerror").hide();
+        $("#minerror").hide();
 
-                age: {
-                    required: true,
-                    number: true,
-                    min: 18
-                },
-                email: {
-                    required: true,
-                    email: true
-                },
-                weight: {
-                    required: {
-                        depends: function(elem) {
-                            return $("#age").val() > 50
-                        }
-                    },
-                    number: true,
-                    min: 0
+        var error_max = true;
+        var error_min = true;
+
+
+
+        $('#salarymax').on("keyup", function() {
+            var maxSalary = $("#salarymax").val();
+            var minSalary = $("#salarymin").val();
+            if ((parseFloat(maxSalary) >= varmin) && (maxSalary <= varmax)) {
+                if (minSalary !== "") {
+                    if (parseFloat(minSalary) > maxSalary) {
+                        $("#minerror").html("Should contain less then MAX Salary");
+                        $("#minerror").css("color", "#F90A0A");
+                        $("#minerror").show();
+                        $("#salarymin").css("border-bottom", "2px solid #F90A0A");
+                        error_min = true;
+                    } else {
+                        $("#minerror").hide();
+                        $("#salarymin").css("border-bottom", "2px solid #34F458");
+                        console.log(minSalary);
+                        error_min = false;
+                    }
                 }
-            },
-            messages: {
-                name: {
-                    minlength: "Name should be at least 3 characters"
-                },
-                age: {
-                    required: "Please enter your age",
-                    number: "Please enter your age as a numerical value",
-                    min: "You must be at least 18 years old"
-                },
-                email: {
-                    email: "The email should be in the format: abc@domain.tld"
-                },
-                weight: {
-                    required: "People with age over 50 have to enter their weight",
-                    number: "Please enter your weight as a numerical value"
-                }
+                $("#maxerror").hide();
+                $("#salarymax").css("border-bottom", "2px solid #34F458");
+                console.log(maxSalary);
+                error_max = false;
+
+            } else {
+                $("#maxerror").html("Should contain only Float/Int and MAX_VALUE." + varmax);
+                $("#maxerror").css("color", "#F90A0A");
+                $("#maxerror").show();
+                $("#salarymax").css("border-bottom", "2px solid #F90A0A");
+                error_max = true;
             }
         });
+
+
+
+        $('#salarymin').on("keyup", function() {
+            var minSalary = $("#salarymin").val();
+            var maxSalary = parseFloat($("#salarymax").val());
+            if ((minSalary >= varmin) &&
+                (parseFloat($("#salarymax").val()) >= minSalary) &&
+                (minSalary <= varmax)) {
+                $("#minerror").hide();
+                $("#salarymin").css("border-bottom", "2px solid #34F458");
+                console.log(minSalary);
+                error_min = false;
+            } else {
+                $("#minerror").html("Should contain only Float/Integer and Less then MAX Salary");
+                $("#minerror").css("color", "#F90A0A");
+                $("#minerror").show();
+                $("#salarymin").css("border-bottom", "2px solid #F90A0A");
+                error_min = true;
+            }
+        });
+
+
+
+        $('#mysalaryForm').submit(function(event) {
+            if ((error_max === false && error_min === false)) {
+                alert("Submit Successfull");
+                return true;
+            } else {
+                alert("Please Fill the form Correctly");
+                return false;
+            }
+        });
+
     });
+
+
+
+
+
+
+    // $("input.decimal").bind("change keyup input", function() {
+    //     var position = this.selectionStart - 1;
+    //     //remove all but number and .
+    //     var fixed = this.value.replace(/[^0-9\.]/g, "");
+    //     if (fixed.charAt(0) === ".")
+    //         //can't start with .
+    //         fixed = fixed.slice(1);
+
+    //     var pos = fixed.indexOf(".") + 1;
+    //     if (pos >= 0)
+    //         //avoid more than one .
+    //         fixed = fixed.substr(0, pos) + fixed.slice(pos).replace(".", "");
+
+    //     if (this.value !== fixed) {
+    //         this.value = fixed;
+    //         this.selectionStart = position;
+    //         this.selectionEnd = position;
+    //     }
+    // });
     </script>
 </body>
 

@@ -6,9 +6,9 @@ $page = '';
 
 if (isset($_GET["page"]) && !empty($_GET["page"])) {
 
-  $page = $_GET["page"];
+    $page = $_GET["page"];
 } else {
-  $page = 1;
+    $page = 1;
 }
 
 $start_from = ($page - 1) * $record_per_page;
@@ -69,44 +69,44 @@ $countRow = count($res);
                     <ul class="pagination">
 
                         <?php
-            $sqlall = "SELECT * FROM users ORDER BY id DESC";
-            $statement = $pdo->prepare($sqlall);
-            $statement->execute();
-            //  ORDER BY id DESC
-            $resall = $statement->fetchAll(PDO::FETCH_ASSOC);
+                        $sqlall = "SELECT * FROM users ORDER BY id DESC";
+                        $statement = $pdo->prepare($sqlall);
+                        $statement->execute();
+                        //  ORDER BY id DESC
+                        $resall = $statement->fetchAll(PDO::FETCH_ASSOC);
 
-            $total_records = count($resall);
-            $total_pages = ceil($total_records / $record_per_page);
-            $start_loop = $page;
-            $difference = $total_pages - $page;
-            if ($difference <= 5) {
-              $start_loop = $total_pages - 5;
-            }
-            $end_loop = $start_loop + 4;
-            if ($page > 1) {
+                        $total_records = count($resall);
+                        $total_pages = ceil($total_records / $record_per_page);
+                        $start_loop = $page;
+                        $difference = $total_pages - $page;
+                        if ($difference <= 5) {
+                            $start_loop = $total_pages - 5;
+                        }
+                        $end_loop = $start_loop + 4;
+                        if ($page > 1) {
 
-              echo '<li  class="page-item"><a class="page-link" href="index.php?page=1">First</a></li>';
-              echo '<li class="page-item"><a class="page-link" href="index.php?page=' . ($page - 1) . '" aria-label="Previous">
+                            echo '<li  class="page-item"><a class="page-link" href="index.php?page=1">First</a></li>';
+                            echo '<li class="page-item"><a class="page-link" href="index.php?page=' . ($page - 1) . '" aria-label="Previous">
             <span aria-hidden="true">&laquo;</span>
           </a>
         </li>';
-            }
-            for ($i = $start_loop; $i <= $end_loop; $i++) {
-              echo '<li id="btn' . $i . '" class="page-item"><a  class="page-link" href="index.php?page=' . $i . '">' . $i . '</a></li>';
-            }
+                        }
+                        for ($i = $start_loop; $i <= $end_loop; $i++) {
+                            echo '<li id="btn' . $i . '" class="page-item"><a  class="page-link" href="index.php?page=' . $i . '">' . $i . '</a></li>';
+                        }
 
-            if ($page <= $end_loop) {
+                        if ($page <= $end_loop) {
 
-              echo '<li class="page-item">
+                            echo '<li class="page-item">
                    <a  class="page-link" href="index.php?page=' . ($page + 1) . '" aria-label="Next">
                     <span aria-hidden="true">&raquo;</span>
                   </a>
                   </li>';
 
-              echo '<li class="page-item"><a class="page-link" href="index.php?page=' . $total_pages . '">Last</a>';
-            }
+                            echo '<li class="page-item"><a class="page-link" href="index.php?page=' . $total_pages . '">Last</a>';
+                        }
 
-            ?>
+                        ?>
 
                     </ul>
                 </nav>
@@ -264,10 +264,10 @@ $countRow = count($res);
                     </thead>
                     <tbody>
                         <?php
-               if (is_array($res)) {
-                  $sn = 1;
-                  foreach ($res as $data) {
-               ?>
+                        if (is_array($res)) {
+                            $sn = 1;
+                            foreach ($res as $data) {
+                        ?>
                         <tr>
                             <td><?php echo $sn; ?></td>
                             <td><?php echo $data['name'] ?? ''; ?></td>
@@ -465,16 +465,16 @@ $countRow = count($res);
 
 
                         <?php
-                $sn++;
-              }
-            } else { ?>
+                                $sn++;
+                            }
+                        } else { ?>
                         <tr>
                             <td colspan="8">
                                 <?php echo $res; ?>
                             </td>
                         <tr>
                             <?php
-            } ?>
+                        } ?>
                     </tbody>
                 </table>
             </div>

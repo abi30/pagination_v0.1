@@ -50,6 +50,7 @@ function paging($limit, $numRows, $page)
     $previous_page = $page - 1;
     $next_page = $page + 1;
 
+    
     $querystring = "";
 
     if ($numRows > $limit) {
