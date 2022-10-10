@@ -2,9 +2,11 @@
 $connection = mysqli_connect("localhost", "root", "");
 $db = mysqli_select_db($connection, 'modalajax');
 
-if (isset($_POST['deletedata'])) {
+if (isset($_POST['deletedata1'])) {
     $id = $_POST['delete_id'];
 
+    print_r("test" . $id);
+    exit();
     $query = "DELETE FROM student WHERE id='$id'";
     $query_run = mysqli_query($connection, $query);
 
