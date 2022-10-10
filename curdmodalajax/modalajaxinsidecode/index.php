@@ -28,15 +28,66 @@ require_once("./deletecode.php");
             </div>
             <div class="card">
                 <div class="card-body">
-                    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#studentaddmodal">
+                    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addModal">
                         ADD DATA
                     </button>
+
+                    <div>
+                        <form action="insertcode.php" method="POST">
+
+                            <div class="modal fade" id="addModal" data-bs-backdrop="static" data-bs-keyboard="false"
+                                tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+
+                                <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h1 class="modal-title fs-5" id="exampleModalLabel">Add User</h1>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                                aria-label="Close"></button>
+                                        </div>
+                                        <div class="modal-body">
+                                            <div class="form-group">
+                                                <label> First Name </label>
+                                                <input type="text" name="fname" class="form-control"
+                                                    placeholder="Enter First Name">
+                                            </div>
+
+                                            <div class="form-group">
+                                                <label> Last Name </label>
+                                                <input type="text" name="lname" class="form-control"
+                                                    placeholder="Enter Last Name">
+                                            </div>
+
+                                            <div class="form-group">
+                                                <label> Course </label>
+                                                <input type="text" name="course" class="form-control"
+                                                    placeholder="Enter Course">
+                                            </div>
+
+                                            <div class="form-group">
+                                                <label> Phone Number </label>
+                                                <input type="number" name="contact" class="form-control"
+                                                    placeholder="Enter Phone Number">
+                                            </div>
+                                        </div>
+
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-secondary"
+                                                data-bs-dismiss="modal">Close</button>
+                                            <button type="submit" name="insertdata" class="btn btn-primary">Save
+                                                user</button>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </form>
+                    </div>
                 </div>
             </div>
 
             <div class="card">
                 <div class="card-body">
-
                     <?php
                     $connection = mysqli_connect("localhost", "root", "");
                     $db = mysqli_select_db($connection, 'modalajax');
@@ -69,16 +120,18 @@ require_once("./deletecode.php");
                                 <td> <?php echo $row['course']; ?> </td>
                                 <td> <?php echo $row['contact']; ?> </td>
                                 <td>
-                                    <button type="button" class="btn btn-info viewbtn"> VIEW </button>
-                                </td>
-                                <td>
-                                    <button type="button" class="btn btn-success editbtn"> EDIT </button>
-                                </td>
-                                <td>
-                                    <button type="button" class="btn btn-danger deletebtn" data-toggle="modal"
-                                        data-target="#deletemodal<?php echo $row['id']; ?>"> DELETE
-                                    </button>
 
+                                    <button type="button" class="btn btn-info" data-bs-toggle="modal"
+                                        data-bs-target="#viewModal<?php echo $row['id']; ?>">
+                                        VIEW
+                                    </button>
+                                </td>
+                                <td>
+
+                                    <button type="button" class="btn btn-success" data-bs-toggle="modal"
+                                        data-bs-target="#editModal<?php echo $row['id']; ?>">
+                                        EDIT
+                                    </button>
                                 </td>
                                 <td>
                                     <button type="button" class="btn btn-danger" data-bs-toggle="modal"
@@ -87,40 +140,156 @@ require_once("./deletecode.php");
                                     </button>
 
                                 </td>
-                                <div>
-                                    <form action="deletecode.php" method="POST">
-                                        <input type="hidden" name="delete_id" id="delete_id"
-                                            value="<?php echo $row['id']; ?>">
-                                        <div class="modal fade" id="deleteModal<?php echo $row['id']; ?>"
-                                            data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
-                                            aria-labelledby="staticBackdropLabel" aria-hidden="true">
+                </div>
+                <div>
+                    <form action="" method="">
+                        <div class="modal fade" id="viewModal<?php echo $row['id']; ?>" data-bs-backdrop="static"
+                            data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel"
+                            aria-hidden="true">
 
-                                            <div class="modal-dialog">
-                                                <div class="modal-content">
-                                                    <div class="modal-header">
-                                                        <h1 class="modal-title fs-5" id="exampleModalLabel">user Id
-                                                            <?php echo $row['id']; ?></h1>
-                                                        <button type="button" class="btn-close" data-bs-dismiss="modal"
-                                                            aria-label="Close"></button>
-                                                    </div>
-                                                    <div class="modal-body">
-                                                        <?php echo $row['fname'] . " " . $row['lname'] . " and dep <b>" . $row['course'] . "</b>"; ?>
-                                                    </div>
-                                                    <div class="modal-footer">
-                                                        <button type="button" class="btn btn-secondary"
-                                                            data-bs-dismiss="modal">Close</button>
-                                                        <button type="submit" name="deletedata1"
-                                                            class="btn btn-primary">Delete
-                                                            user</button>
-                                                    </div>
-                                                </div>
-                                            </div>
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h1 class="modal-title fs-5" id="exampleModalLabel">user Id
+                                            <?php echo $row['id']; ?></h1>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                            aria-label="Close"></button>
+                                    </div>
 
+
+                                    <div class="modal-body">
+                                        <div class="form-group">
+                                            <label> First Name </label>
+                                            <input type="text" name="fname" class="form-control"
+                                                value="<?php echo $row['fname']; ?>" placeholder="Enter First Name"
+                                                readonly>
                                         </div>
-                                    </form>
+
+                                        <div class="form-group">
+                                            <label> Last Name </label>
+                                            <input type="text" name="lname" class="form-control"
+                                                value="<?php echo $row['lname']; ?>" placeholder="Enter Last Name"
+                                                readonly>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label> Course </label>
+                                            <input type="text" name="course" class="form-control"
+                                                value="<?php echo $row['course']; ?>" placeholder="Enter Course"
+                                                readonly>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label> Phone Number </label>
+                                            <input type="number" name="contact" class="form-control"
+                                                value="<?php echo $row['contact']; ?>" placeholder="Enter Phone Number"
+                                                readonly>
+                                        </div>
+                                    </div>
+
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary"
+                                            data-bs-dismiss="modal">Close</button>
+                                    </div>
                                 </div>
-                            </tr>
-                        </tbody>
+                            </div>
+
+                        </div>
+                    </form>
+                </div>
+                <div>
+                    <form action="updatecode.php" method="POST">
+                        <input type="hidden" name="update_id" id="update_id" value="<?php echo $row['id']; ?>">
+                        <div class="modal fade" id="editModal<?php echo $row['id']; ?>" data-bs-backdrop="static"
+                            data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel"
+                            aria-hidden="true">
+
+
+                            <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h1 class="modal-title fs-5" id="exampleModalLabel">edit User id
+                                            :<?php echo $row['id']; ?></h1>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                            aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <div class="form-group">
+                                            <label> First Name </label>
+                                            <input type="text" name="fname" class="form-control"
+                                                value="<?php echo $row['fname']; ?>" placeholder="Enter First Name">
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label> Last Name </label>
+                                            <input type="text" name="lname" class="form-control"
+                                                value="<?php echo $row['lname']; ?>" placeholder="Enter Last Name">
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label> Course </label>
+                                            <input type="text" name="course" class="form-control"
+                                                value="<?php echo $row['course']; ?>" placeholder="Enter Course">
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label> Phone Number </label>
+                                            <input type="number" name="contact" class="form-control"
+                                                value="<?php echo $row['contact']; ?>" placeholder="Enter Phone Number">
+                                        </div>
+                                    </div>
+
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary"
+                                            data-bs-dismiss="modal">Close</button>
+                                        <button type="submit" name="updatedata" class="btn btn-primary">Edit
+                                            data</button>
+                                    </div>
+                                </div>
+                            </div>
+
+
+
+                        </div>
+                    </form>
+                </div>
+                <div>
+                    <form action="deletecode.php" method="POST">
+                        <input type="hidden" name="delete_id" id="delete_id" value="<?php echo $row['id']; ?>">
+                        <div class="modal fade" id="deleteModal<?php echo $row['id']; ?>" data-bs-backdrop="static"
+                            data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel"
+                            aria-hidden="true">
+
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h1 class="modal-title fs-5" id="exampleModalLabel">user Id
+                                            <?php echo $row['id']; ?></h1>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                            aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <?php echo $row['fname'] . " " . $row['lname'] . " and dep <b>" . $row['course'] . "</b>"; ?>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary"
+                                            data-bs-dismiss="modal">Close</button>
+                                        <button type="submit" name="deletedata" class="btn btn-primary">Delete
+                                            user</button>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </form>
+                </div>
+
+
+
+
+
+                </tr>
+                </tbody>
 
 
 
@@ -129,18 +298,18 @@ require_once("./deletecode.php");
 
 
 
-                        <?php
+                <?php
                             }
                         } else {
                             echo "No Record Found";
                         }
-                        ?>
-                    </table>
-                </div>
+        ?>
+                </table>
             </div>
-
-
         </div>
+
+
+    </div>
     </div>
 
 
